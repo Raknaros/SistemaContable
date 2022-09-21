@@ -1,0 +1,5 @@
+if [SUBDIARIO] = 8 and
+[T DE OPERACION] = 2 and
+[DESTINO] = 4
+then [base_imponible_mn]
+else null

@@ -1,0 +1,174 @@
+CREATE TABLE exercise_logs
+    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT,
+    minutes INTEGER, 
+    calories INTEGER,
+    heart_rate INTEGER);
+
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("biking", 30, 115, 110);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("biking", 10, 45, 105);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("dancing", 15, 200, 120);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("dancing", 15, 165, 120);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("tree climbing", 30, 70, 90);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("tree climbing", 25, 72, 80);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("rowing", 30, 70, 90);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("hiking", 60, 80, 85);
+
+SELECT * FROM exercise_logs;
+
+SELECT type, SUM(calories) AS total_calories FROM exercise_logs GROUP BY type;
+
+SELECT type, SUM(calories) AS total_calories FROM exercise_logs
+    GROUP BY type
+    HAVING total_calories > 150
+    ;
+
+SELECT type, AVG(calories) AS avg_calories FROM exercise_logs
+    GROUP BY type
+    HAVING avg_calories > 70
+    ; 
+    
+SELECT type FROM exercise_logs GROUP BY type HAVING COUNT(*) >= 3;
+---------------------------------------------------------------------------------------------------
+CREATE TABLE exercise_logs
+    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT,
+    minutes INTEGER, 
+    calories INTEGER,
+    heart_rate INTEGER);
+
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("biking", 30, 100, 110);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("biking", 10, 30, 105);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("dancing", 15, 200, 120);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("dancing", 15, 165, 120);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("tree climbing", 30, 70, 90);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("tree climbing", 25, 72, 80);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("rowing", 30, 70, 90);
+INSERT INTO exercise_logs(type, minutes, calories, heart_rate) VALUES ("hiking", 60, 80, 85);
+
+SELECT * FROM exercise_logs;
+
+SELECT COUNT(*) FROM exercise_logs WHERE heart_rate > 220 - 30;
+
+/* 50-90% of max*/
+SELECT COUNT(*) FROM exercise_logs WHERE
+    heart_rate >= ROUND(0.50 * (220-30)) 
+    AND  heart_rate <= ROUND(0.90 * (220-30));
+    
+/* CASE */
+SELECT type, heart_rate,
+    CASE 
+        WHEN heart_rate > 220-30 THEN "above max"
+        WHEN heart_rate > ROUND(0.90 * (220-30)) THEN "above target"
+        WHEN heart_rate > ROUND(0.50 * (220-30)) THEN "within target"
+        ELSE "below target"
+    END as "hr_zone"
+FROM exercise_logs;
+
+SELECT COUNT(*),
+    CASE 
+        WHEN heart_rate > 220-30 THEN "above max"
+        WHEN heart_rate > ROUND(0.90 * (220-30)) THEN "above target"
+        WHEN heart_rate > ROUND(0.50 * (220-30)) THEN "within target"
+        ELSE "below target"
+    END as "hr_zone"
+FROM exercise_logs
+GROUP BY hr_zone;
+-------------------------------
+SELECT name, number_grade,
+    CASE
+        WHEN number_grade > 90 THEN "A"
+        WHEN number grade > 80 THEN "B"
+        WHEN number_grade > 70 THEN "C"
+        ELSE "F"
+    END AS "letter_grade"
+FROM student_grades;
+
+SELECT COUNT(*)
+    CASE
+        WHEN number_grade > 90 THEN "A"
+        WHEN number grade > 80 THEN "B"
+        WHEN number_grade > 70 THEN "C"
+        ELSE "F"
+    END AS "letter_grade"
+FROM student_grades
+GROUP BY letter_grade;
+---------------------------------------------
+/* cross join */
+SELECT * FROM student_grades, students;
+
+/* implicit inner join */
+SELECT * FROM student_grades, students
+    WHERE student_grades.student_id = students.id;
+    
+/* explicit inner join - JOIN */
+SELECT students.first_name, students.last_name, students.email, student_grades.test, student_grades.grade FROM students
+    JOIN student_grades
+    ON students.id = student_grades.student_id
+    WHERE grade > 90;
+
+/* outer join */ 
+SELECT students.first_name, students.last_name, student_projects.title
+    FROM students
+    LEFT OUTER JOIN student_projects
+    ON students.id = student_projects.student_id;
+
+
+
+SELECT customers.name, customers.email, orders.item, orders.price FROM customers
+    LEFT OUTER JOIN orders
+    ON customers.id = orders.customer_id;
+    
+SELECT customers.name, customers.email, SUM(orders.price) AS "monto_total" FROM customers
+    LEFT OUTER JOIN orders
+    ON customers.id = orders.customer_id
+    GROUP BY orders.customer_id
+    ORDER BY price DESC;
+    
+
+/* self join */
+SELECT students.first_name, students.last_name, buddies.email as buddy_email
+    FROM students
+    JOIN students buddies
+    ON students.buddy_id = buddies.id;
+
+
+SELECT a.title, b.title FROM project_pairs
+    JOIN student_projects a
+    ON project_pairs.project1_id = a.id
+    JOIN student_projects b
+    ON project_pairs.project2_id = b.id;
+
+-----------------------------------------
+
+UPDATE diary_logs SET content = "I had a horrible fight with OhNoesGuy" WHERE id = 1;
+
+SELECT * FROM diary_logs;
+
+DELETE FROM diary_logs WHERE id = 1;
+
+------------------------------------------------------------------
+ALTER TABLE diary_logs ADD emotion TEXT default "unknown";
+
+INSERT INTO diary_logs (user_id, date, content, emotion) VALUES (1, "2015-04-03",
+    "We went to Disneyland!", "happy");
+    
+SELECT * FROM diary_logs;
+
+DROP TABLE diary_logs;
+-----------------------------
+
+
+INSERT INTO entities(entity_id, nombre_razon, numero_documento, telefono, email, domicilio_fiscal, distrito, ciudad, departamento, usuario_sol, clave_sol) VALUES(2, 'NEGOCIACIONES EAC JC SAC', 20516852705, 998186467, 'negoc.eacjc@gmail.com', 'Mz. G Lt. 4A Urb. La Ensenada', 'Puente Piedra', 'Lima', 'Lima', 'AAL7ESTL', 'Nego2020');
+INSERT INTO entities(entity_id, nombre_razon, numero_documento, telefono, email, domicilio_fiscal, distrito, ciudad, departamento, usuario_sol, clave_sol) VALUES(3, 'ALIAGA ORTIZ LILIA ROXANA', 10726501306, 956019944, 'lilia_aliaga@hotmail.com', 'Urb. Pangaravi Bajo S/N', 'Vista Alegre', 'Nasca', 'Ica', 'USANKYUL', 'liroalort');
+
+
+
+
+
+
+
+
+	Guía y asesoría en distintos procesos
+- Declaración Anual 2021
+- Libro Inventarios y Balances, Diario, Caja y Bancos / Pendiente
