@@ -163,12 +163,3 @@ INSERT INTO entities(entity_id, nombre_razon, numero_documento, telefono, email,
 INSERT INTO entities(entity_id, nombre_razon, numero_documento, telefono, email, domicilio_fiscal, distrito, ciudad, departamento, usuario_sol, clave_sol) VALUES(3, 'ALIAGA ORTIZ LILIA ROXANA', 10726501306, 956019944, 'lilia_aliaga@hotmail.com', 'Urb. Pangaravi Bajo S/N', 'Vista Alegre', 'Nasca', 'Ica', 'USANKYUL', 'liroalort');
 
 
-
-
-
-
-
-
-	Guía y asesoría en distintos procesos
-- Declaración Anual 2021
-- Libro Inventarios y Balances, Diario, Caja y Bancos / Pendiente
