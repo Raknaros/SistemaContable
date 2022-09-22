@@ -137,6 +137,17 @@ CREATE TABLE subdiary (
 	codigo INTEGER UNIQUE,
 	subdiario TEXT UNIQUE
 );
+CREATE TABLE tc (
+	fecha_sbs DATE NOT NULL,
+	fecha_sunat DATE NOT NULL,
+	usd_b DEC(5,3),
+	usd_s DEC(5,3)
+);
+CREATE TABLE changeslog (
+	usuario VARCHAR,
+	subdiario INT,
+	instante TIMESTAMP
+);
 CREATE TABLE _01 (
 );
 CREATE TABLE _02 (

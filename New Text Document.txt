@@ -1,0 +1,136 @@
+#generico trigger
+CREATE TRIGGER trigger_name 
+   {BEFORE | AFTER |INSTEAD OF} { event_name }
+   ON table_name
+   [FOR [EACH] { ROW | STATEMENT }]
+       EXECUTE PROCEDURE trigger_function
+
+#generico funcion
+CREATE FUNCTION trigger_function() 
+   RETURNS TRIGGER 
+   LANGUAGE PLPGSQL
+AS $$
+BEGIN
+   -- trigger logic
+END;
+$$
+
+#registrar cambios
+CREATE OR REPLACE FUNCTION auditlogfunc() RETURNS TRIGGER AS $example_table$
+   BEGIN
+      INSERT INTO AUDIT(EMP_ID, ENTRY_DATE) VALUES (new.ID, current_timestamp);
+      RETURN NEW;
+   END;
+$example_table$ LANGUAGE plpgsql;
+insertar en tabla test despues de insertar
+#ejemplo2
+CREATE OR REPLACE FUNCTION test()
+  RETURNS trigger AS
+$$
+BEGIN
+         INSERT INTO test_table(col1,col2,col3)
+         VALUES(NEW.col1,NEW.col2,current_date);
+ 
+    RETURN NEW;
+END;
+$$
+LANGUAGE 'plpgsql';
+#quitar espacios antes de insertar
+CREATE OR REPLACE FUNCTION befo_insert()
+  RETURNS trigger AS
+$$
+BEGIN
+NEW.FIRST_NAME = LTRIM(NEW.FIRST_NAME);
+NEW.LAST_NAME = LTRIM(NEW.LAST_NAME);
+NEW.JOB_ID = UPPER(NEW.JOB_ID);
+RETURN NEW;
+END;
+
+$$
+LANGUAGE 'plpgsql';
+
+#insertar dato concatenado despues de insertar
+CREATE OR REPLACE FUNCTION aft_update()
+  RETURNS trigger AS
+$$
+BEGIN
+INSERT into stu_log VALUES (user, CONCAT('Update Student Record ',
+         OLD.NAME,' Previous Class :',OLD.ST_CLASS,' Present Class ',
+         NEW.st_class));
+RETURN NEW;
+END;
+
+$$
+LANGUAGE 'plpgsql';
+
+#totalizar y clasificar puntajes 
+CREATE OR REPLACE FUNCTION befo_update()
+  RETURNS trigger AS
+$$
+BEGIN
+NEW.TOTAL = NEW.SUB1 + NEW.SUB2 + NEW.SUB3 + NEW.SUB4 + NEW.SUB5; 
+NEW.PER_MARKS = NEW.TOTAL/5;
+IF NEW.PER_MARKS >=90 THEN
+NEW.GRADE = 'EXCELLENT';
+ELSEIF NEW.PER_MARKS>=75 AND NEW.PER_MARKS<90 THEN
+NEW.GRADE = 'VERY GOOD';
+ELSEIF NEW.PER_MARKS>=60 AND NEW.PER_MARKS<75 THEN
+NEW.GRADE = 'GOOD';
+ELSEIF NEW.PER_MARKS>=40 AND NEW.PER_MARKS<60 THEN
+NEW.GRADE = 'AVERAGE';
+ELSE
+NEW.GRADE = 'NOT PROMOTED';
+END IF;
+
+#funcion con condicional de length y if or
+CREATE OR REPLACE FUNCTION before_insert()
+
+RETURNS trigger AS
+
+$$
+
+BEGIN
+IF NEW.name = '' or NEW.address = '' or NEW.contact_no = '' THEN
+raise 'Name or Address or contact_no field is empty.';
+END IF;
+IF length(NEW.name) < 5 THEN
+raise 'Name field must contain more than 5 characters.';
+END IF;
+IF length(NEW.contact_no) = 11 THEN
+NEW.contact_no = '+88' || NEW.contact_no;
+END IF;
+RETURN NEW;
+END;
+$$
+
+LANGUAGE 'plpgsql';
+
+RETURN NEW;
+END;
+
+$$
+LANGUAGE 'plpgsql';
+
+#verificar cambio y registar cambios en otra tabla
+CREATE OR REPLACE FUNCTION log_last_name_changes()
+  RETURNS TRIGGER 
+  LANGUAGE PLPGSQL
+  AS
+$$
+BEGIN
+	IF NEW.last_name <> OLD.last_name THEN
+		 INSERT INTO employee_audits(employee_id,last_name,changed_on)
+		 VALUES(OLD.id,OLD.last_name,now());
+	END IF;
+
+	RETURN NEW;
+END;
+$$
+
+#audit con current_timestamp
+CREATE OR REPLACE FUNCTION auditfunc() RETURNS TRIGGER AS $my_table$
+   BEGIN
+      INSERT INTO Price_Audits(book_id, entry_date) VALUES (new.ID, current_timestamp);
+      RETURN NEW;
+   END;
+$my_table$ LANGUAGE plpgsql;

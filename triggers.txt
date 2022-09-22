@@ -1,0 +1,60 @@
+SET DATESTYLE 'EUROPEAN';
+
+INSERT INTO _08 (entity_id, subdiario, tipo_comprobante, numero_serie, numero_correlativo) VALUES (1, 8, 14, '0001', 49319230);
+
+CREATE TABLE _08 (
+	entity_id INTEGER,
+	subdiario INTEGER, 
+	cuo VARCHAR,
+	tipo_operacion INTEGER,
+	tipo_comprobante INTEGER,
+	fecha_emision DATE,
+	fecha_vencimiento DATE,
+	numero_serie VARCHAR,
+	numero_correlativo INTEGER,
+	cuc VARCHAR);
+
+CREATE TRIGGER fill_cuc08 BEFORE INSERT ON _08 FOR EACH ROW EXECUTE PROCEDURE fill_cuc08();
+
+
+
+#RELLENAR CUC08
+CREATE OR REPLACE FUNCTION fill_cuc08() 
+RETURNS TRIGGER AS
+$$ 
+DECLARE      
+BEGIN
+    NEW.cuc = CONCAT(NEW.entity_id,NEW.subdiario,NEW.tipo_comprobante,NEW.numero_serie,NEW.numero_correlativo);
+    return new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER fill_cuc08 BEFORE INSERT ON _08 FOR EACH ROW EXECUTE PROCEDURE fill_cuc08();
+
+#RELLENAR CUC09
+CREATE OR REPLACE FUNCTION fill_cuc09() 
+RETURNS TRIGGER AS
+$$ 
+DECLARE      
+BEGIN
+    NEW.cuc = CONCAT(NEW.entity_id,NEW.subdiario,NEW.tipo_comprobante,NEW.numero_serie,NEW.numero_correlativo);
+    return new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER fillcuc09 BEFORE INSERT ON _09 FOR EACH ROW EXECUTE PROCEDURE fill_cuc09();
+
+#GENERAR PAGO EFECTIVO LIBRO CAJA
+
+#GENERAR COBRO EFECTIVO LIBRO CAJA
+
+#GENERAR ASIENTOS DE DIARIO SEGÚN LIBRO CAJA Y BANCOS
+
+#GENERAR ASIENTOS DE DIARIO SEGÚN REGISTRO DE COMPRAS
+
+#GENERAR ASIENTOS DE DIARIO SEGÚN REGISTRO DE VENTAS
+
+#GENERAR DESTINOS EN LIBRO DIARIO SEGÚN ASIENTOS DE DIARIO
+
+
+#RELLENAR TABLA CHANGESLOG
