@@ -146,6 +146,7 @@ CREATE TABLE tc (
 CREATE TABLE changeslog (
 	usuario VARCHAR,
 	subdiario INT,
+	cuc VARCHAR,
 	instante TIMESTAMP
 );
 CREATE TABLE _01 (

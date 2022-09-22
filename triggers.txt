@@ -1,6 +1,10 @@
 SET DATESTYLE 'EUROPEAN';
 
-INSERT INTO _08 (entity_id, subdiario, tipo_comprobante, numero_serie, numero_correlativo) VALUES (1, 8, 14, '0001', 49319230);
+INSERT INTO _08 (entity_id, subdiario, tipo_comprobante, numero_serie, numero_correlativo) VALUES (1, 8, 14, '0401', 4932);
+
+UPDATE _08 SET
+entity_id = 3
+WHERE cuc = '181E00140';
 
 CREATE TABLE _08 (
 	entity_id INTEGER,
@@ -14,35 +18,59 @@ CREATE TABLE _08 (
 	numero_correlativo INTEGER,
 	cuc VARCHAR);
 
-CREATE TRIGGER fill_cuc08 BEFORE INSERT ON _08 FOR EACH ROW EXECUTE PROCEDURE fill_cuc08();
+
+TIGGERS
+#RELLENAR CUC TABLE 05
+CREATE TRIGGER fillcuc05 BEFORE INSERT ON _05 FOR EACH ROW EXECUTE PROCEDURE fill_cuc();
+#RELLENAR CUC TABLE 08
+CREATE TRIGGER fill_cuc08 BEFORE INSERT ON _08 FOR EACH ROW EXECUTE PROCEDURE fill_cuc();
+#ACTUALIZAR CUC TABLA 05
+CREATE TRIGGER update_cuc05 BEFORE UPDATE ON _05 FOR EACH ROW EXECUTE PROCEDURE update_cuc();
+#ACTUALIZAR CUC TABLE 08
+CREATE TRIGGER update_cuc08 BEFORE UPDATE ON _08 FOR EACH ROW EXECUTE PROCEDURE update_cuc();
 
 
 
-#RELLENAR CUC08
-CREATE OR REPLACE FUNCTION fill_cuc08() 
+
+
+
+
+
+
+
+
+FUNCTIONS
+#RELLENAR CUC
+CREATE OR REPLACE FUNCTION fill_cuc() 
 RETURNS TRIGGER AS
 $$ 
 DECLARE      
-BEGIN
-    NEW.cuc = CONCAT(NEW.entity_id,NEW.subdiario,NEW.tipo_comprobante,NEW.numero_serie,NEW.numero_correlativo);
+BEGIN    
+NEW.cuc = CONCAT(NEW.entity_id,NEW.subdiario,NEW.tipo_comprobante,NEW.numero_serie,NEW.numero_correlativo);
     return new;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER fill_cuc08 BEFORE INSERT ON _08 FOR EACH ROW EXECUTE PROCEDURE fill_cuc08();
+#ACTUALIZAR CUC
+CREATE OR REPLACE FUNCTION update_cuc() 
+RETURNS TRIGGER AS
+$$ 
+DECLARE      
+BEGIN
+IF NEW.entity_id <> OLD.entity_id OR NEW.tipo_comprobante <> OLD.tipo_comprobante OR NEW.numero_correlativo <> OLD.numero_correlativo THEN
+    NEW.cuc = CONCAT(NEW.entity_id,NEW.subdiario,NEW.tipo_comprobante,NEW.numero_serie,NEW.numero_correlativo);
+END IF;
+    return new;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
 
 #RELLENAR CUC09
-CREATE OR REPLACE FUNCTION fill_cuc09() 
-RETURNS TRIGGER AS
-$$ 
-DECLARE      
-BEGIN
-    NEW.cuc = CONCAT(NEW.entity_id,NEW.subdiario,NEW.tipo_comprobante,NEW.numero_serie,NEW.numero_correlativo);
-    return new;
-END;
-$$ LANGUAGE plpgsql;
 
-CREATE TRIGGER fillcuc09 BEFORE INSERT ON _09 FOR EACH ROW EXECUTE PROCEDURE fill_cuc09();
+
+CREATE TRIGGER fillcuc09 BEFORE INSERT ON _09 FOR EACH ROW EXECUTE PROCEDURE fill_cuc();
 
 #GENERAR PAGO EFECTIVO LIBRO CAJA
 
@@ -58,3 +86,9 @@ CREATE TRIGGER fillcuc09 BEFORE INSERT ON _09 FOR EACH ROW EXECUTE PROCEDURE fil
 
 
 #RELLENAR TABLA CHANGESLOG
+CREATE OR REPLACE FUNCTION registerchanges() RETURNS TRIGGER AS $$
+   BEGIN
+      INSERT INTO changeslog(usuario,subdiario,cuc,instante) VALUES (current_user, new.subdiario,new.cuc,now());
+      RETURN NEW;
+   END;
+$$ LANGUAGE plpgsql;
