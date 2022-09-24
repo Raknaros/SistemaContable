@@ -1,3 +1,21 @@
+#Primero creamos la base de datos con las configuraciones que necesitamos
+CREATE DATABASE minegocio
+    WITH
+    OWNER = admindb
+    TEMPLATE = template0
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'es_PE.utf8'
+    LC_CTYPE = 'es_PE.utf8';
+#Le otorgamos los privilegios al usuario administrador
+GRANT all privileges ON database impulsadb TO admindb;
+#Configuramos el formato de fecha al que se utiliza comúnmente
+ALTER DATABASE test SET datestyle TO 'ISO, DMY';
+#Creamos el esquema contabilidad(cont), así lo diferenciamos del public(asignado por defecto)
+CREATE SCHEMA cont;
+
+
+
+
 SET DATESTYLE 'EUROPEAN';
 
 INSERT INTO _08 (entity_id, subdiario, tipo_comprobante, numero_serie, numero_correlativo) VALUES (1, 8, 14, '0401', 4932);
@@ -28,7 +46,6 @@ CREATE TRIGGER fill_cuc08 BEFORE INSERT ON _08 FOR EACH ROW EXECUTE PROCEDURE fi
 CREATE TRIGGER update_cuc05 BEFORE UPDATE ON _05 FOR EACH ROW EXECUTE PROCEDURE update_cuc();
 #ACTUALIZAR CUC TABLE 08
 CREATE TRIGGER update_cuc08 BEFORE UPDATE ON _08 FOR EACH ROW EXECUTE PROCEDURE update_cuc();
-
 
 
 

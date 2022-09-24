@@ -1,120 +1,124 @@
-CREATE TABLE TABLAS (
+CREATE TABLE acc.tablas (
 	codigo VARCHAR UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS01 (
+CREATE TABLE acc.ts01 (
 	medio_pago INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS02 (
+CREATE TABLE acc.ts02 (
 	tipo_documento VARCHAR UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS03 (
+CREATE TABLE acc.ts03 (
 	entidad_financiera INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS04 (
+CREATE TABLE acc.ts04 (
 	tipo_moneda VARCHAR UNIQUE,
 	descripcion VARCHAR,
 	zona_referencia VARCHAR
 );
-CREATE TABLE TS05 (
+CREATE TABLE acc.ts05 (
 	tipo_existencia INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS06 (
+CREATE TABLE acc.ts06 (
 	unidad_medida VARCHAR UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS07 (
+CREATE TABLE acc.ts07 (
 	tipo_intangible INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS10 (
+CREATE TABLE acc.ts10 (
 	tipo_comprobante INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS11 (
+CREATE TABLE acc.ts11 (
 	codigo_aduana INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS12 (
+CREATE TABLE acc.ts12 (
 	tipo_operacion INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS14 (
+CREATE TABLE acc.ts14 (
 	metodo_valuacion INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS15 (
+CREATE TABLE acc.ts15 (
 	tipo_titulo INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS16 (
+CREATE TABLE acc.ts16 (
 	tipo_acciones INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS17 (
+CREATE TABLE acc.ts17 (
 	tipo_plan_cuentas INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS18 (
+CREATE TABLE acc.ts18 (
 	tipo_activo_fijo INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS19 (
+CREATE TABLE acc.ts19 (
 	estado_activo_fijo INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS20 (
+CREATE TABLE acc.ts20 (
 	metodo_depreciacion INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS21 (
+CREATE TABLE acc.ts21 (
 	agrupamiento_costo_produccion_anual INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS22 (
+CREATE TABLE acc.ts22 (
 	catalogo_estados_financieros INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS25 (
+CREATE TABLE acc.ts25 (
 	convenio_doble_tributacion INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS27 (
+CREATE TABLE acc.ts27 (
 	vinculacion_economica INTEGER UNIQUE,
 	descripcion VARCHAR,
 	articulo_ley VARCHAR
 );
-CREATE TABLE TS30 (
+CREATE TABLE acc.ts30 (
 	clasificacion_bienes_servicios INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS31 (
+CREATE TABLE acc.ts31 (
 	tipo_renta INTEGER UNIQUE,
 	descripcion VARCHAR,
 	articulo_ley VARCHAR,
 	codigo_ocde VARCHAR
 );
-CREATE TABLE TS32 (
+CREATE TABLE acc.ts32 (
 	servicio_nodomiciliado INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS33 (
+CREATE TABLE acc.ts33 (
 	exoneraciones_nodomiciliado INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS34 (
+CREATE TABLE acc.ts34 (
 	rubro_estados_financieros VARCHAR UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE TS35 (
+CREATE TABLE acc.ts35 (
 	paises INTEGER UNIQUE,
 	descripcion VARCHAR
 );
-CREATE TABLE entities (
+CREATE TABLE acc.ta10 (
+	codigo_tributo INTEGER UNIQUE,
+	descripcion VARCHAR
+);
+CREATE TABLE acc.entities (
 	entity_id INTEGER UNIQUE,
 	nombre_razon VARCHAR UNIQUE,
 	numero_documento BIGINT UNIQUE,
@@ -128,36 +132,36 @@ CREATE TABLE entities (
 	usuario_sol VARCHAR,
 	clave_sol VARCHAR
 );
-CREATE TABLE related (
+CREATE TABLE acc.related (
 	numero_documento BIGINT UNIQUE,
 	nombre_razon VARCHAR UNIQUE,
 	cuenta_detracciones BIGINT UNIQUE
 );
-CREATE TABLE subdiary (
+CREATE TABLE acc.subdiary (
 	codigo INTEGER UNIQUE,
 	subdiario TEXT UNIQUE
 );
-CREATE TABLE tc (
+CREATE TABLE acc.tc (
 	fecha_sbs DATE NOT NULL,
 	fecha_sunat DATE NOT NULL,
 	usd_b DEC(5,3),
 	usd_s DEC(5,3)
 );
-CREATE TABLE changeslog (
+CREATE TABLE acc.changeslog (
 	usuario VARCHAR,
 	subdiario INT,
 	cuc VARCHAR,
 	instante TIMESTAMP
 );
-CREATE TABLE _01 (
+CREATE TABLE acc._01 (
 );
-CREATE TABLE _02 (
+CREATE TABLE acc._02 (
 );
-CREATE TABLE _03 (
+CREATE TABLE acc._03 (
 );
-CREATE TABLE _04 (
+CREATE TABLE acc._04 (
 );
-CREATE TABLE _05 (
+CREATE TABLE acc._05 (
 	entity_id INTEGER REFERENCES entities(entity_id) ON DELETE SET NULL,
 	subdiario INTEGER REFERENCES subdiary(codigo) ON DELETE SET NULL, 
 	cuo VARCHAR,
@@ -307,11 +311,11 @@ CREATE TABLE _05 (
 	fecha_cuota60 DATE,
 	importe_cuota60 REAL
 );
-CREATE TABLE _06 (
+CREATE TABLE acc._06 (
 );
-CREATE TABLE _07 (
+CREATE TABLE acc._07 (
 );
-CREATE TABLE _08 (
+CREATE TABLE acc._08 (
 	entity_id INTEGER REFERENCES entities(entity_id) ON DELETE SET NULL,
 	subdiario INTEGER REFERENCES subdiary(codigo) ON DELETE SET NULL, 
 	cuo VARCHAR,
@@ -462,7 +466,7 @@ CREATE TABLE _08 (
 	fecha_cuota60 DATE,
 	importe_cuota60 REAL
 );
-CREATE TABLE _09 (
+CREATE TABLE acc._09 (
 	entity_id INTEGER REFERENCES entities(entity_id) ON DELETE SET NULL,
 	subdiario INTEGER REFERENCES subdiary(codigo) ON DELETE SET NULL,
 	periodo_tributario INTEGER,
@@ -536,7 +540,7 @@ CREATE TABLE _09 (
 	_319 INTEGER,
 	_324 INTEGER
 );
-CREATE TABLE _10 (
+CREATE TABLE acc._10 (
 	entity_id INTEGER REFERENCES entities(entity_id) ON DELETE SET NULL,
 	subdiario INTEGER REFERENCES subdiary(codigo) ON DELETE SET NULL,
 	periodo_tributario INTEGER,
