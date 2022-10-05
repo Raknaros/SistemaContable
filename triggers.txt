@@ -16,6 +16,9 @@ CREATE SCHEMA cont;
 
 
 
+
+
+
 SET DATESTYLE 'EUROPEAN';
 
 INSERT INTO _08 (entity_id, subdiario, tipo_comprobante, numero_serie, numero_correlativo) VALUES (1, 8, 14, '0401', 4932);
@@ -37,20 +40,27 @@ CREATE TABLE _08 (
 	cuc VARCHAR);
 
 
+
+
+
+
 TIGGERS
 #RELLENAR CUC TABLE 05
-CREATE TRIGGER fillcuc05 BEFORE INSERT ON _05 FOR EACH ROW EXECUTE PROCEDURE fill_cuc();
+CREATE TRIGGER fillcuc05 BEFORE INSERT ON acc._05 FOR EACH ROW EXECUTE PROCEDURE fill_cuc();
 #RELLENAR CUC TABLE 08
-CREATE TRIGGER fill_cuc08 BEFORE INSERT ON _08 FOR EACH ROW EXECUTE PROCEDURE fill_cuc();
+CREATE TRIGGER fill_cuc08 BEFORE INSERT ON acc._08 FOR EACH ROW EXECUTE PROCEDURE fill_cuc();
 #ACTUALIZAR CUC TABLA 05
-CREATE TRIGGER update_cuc05 BEFORE UPDATE ON _05 FOR EACH ROW EXECUTE PROCEDURE update_cuc();
+CREATE TRIGGER update_cuc05 BEFORE UPDATE ON acc._05 FOR EACH ROW EXECUTE PROCEDURE update_cuc();
 #ACTUALIZAR CUC TABLE 08
-CREATE TRIGGER update_cuc08 BEFORE UPDATE ON _08 FOR EACH ROW EXECUTE PROCEDURE update_cuc();
-
-
-
-
-
+CREATE TRIGGER update_cuc08 BEFORE UPDATE ON acc._08 FOR EACH ROW EXECUTE PROCEDURE update_cuc();
+#CREAR REGISTRO DE PAGO SUBDIARIO CAJA
+CREATE TRIGGER pago_caja AFTER INSERT ON acc._08 FOR EACH ROW EXECUTE PROCEDURE cash_payment();
+#CREAR REGISTRO DE COBRO SUBDIARIO CAJA
+CREATE TRIGGER cobro_caja AFTER INSERT ON acc._05 FOR EACH ROW EXECUTE PROCEDURE cash_payment();
+#RELLENAR TABLA RELATED DE 05
+CREATE TRIGGER fill_related05 AFTER INSERT ON acc._05 FOR EACH ROW EXECUTE PROCEDURE fill_related();
+#RELLENAR TABLA RELATED DE 08
+CREATE TRIGGER fill_related08 AFTER INSERT ON acc._08 FOR EACH ROW EXECUTE PROCEDURE fill_related();
 
 
 
@@ -60,11 +70,10 @@ FUNCTIONS
 #RELLENAR CUC
 CREATE OR REPLACE FUNCTION fill_cuc() 
 RETURNS TRIGGER AS
-$$ 
-DECLARE      
+$$   
 BEGIN    
-NEW.cuc = CONCAT(NEW.entity_id,NEW.subdiario,NEW.tipo_comprobante,NEW.numero_serie,NEW.numero_correlativo);
-    return new;
+	NEW.cuc = CONCAT(NEW.entity_id,NEW.subdiario,NEW.tipo_comprobante,NEW.numero_serie,NEW.numero_correlativo);
+	return new;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -83,23 +92,127 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-#GENERAR PAGO EFECTIVO LIBRO CAJA
+#GENERAR PAGO O COBRO EFECTIVO LIBRO CAJA
+CREATE OR REPLACE FUNCTION cash_payment() RETURNS TRIGGER AS $$
+DECLARE
+	movimiento INTEGER:= CASE WHEN NEW.subdiario = 5 THEN '1' ELSE '2' END CASE;
+	total DEC(10,2):= (1.18*NEW.valor) + NEW.isc + NEW.icbp + NEW.otros_cargos;
+	total_mn DEC(10,2):= CASE WHEN NEW.tipo_moneda = 'USD' THEN (select usd_s from tc WHERE fecha_sunat = NEW.fecha_emision) * total ELSE total END CASE;
+BEGIN
+	IF total_mn<3000 AND NEW.medio_pago ISNULL THEN
+		INSERT INTO _01(entity_id,tipo_movimiento,tipo_comprobante,numero_serie,numero_correlativo,fecha_operacion,importe, tipo_moneda) VALUES (NEW.entity_id, movimiento, NEW.tipo_comprobante, NEW.numero_serie, NEW.numero_correlativo, NEW.fecha_emision, total_mn, 'PEN'); 
+	END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
 
-#GENERAR COBRO EFECTIVO LIBRO CAJA
+INSERT INTO _05 (entity_id,tipo_operacion,tipo_comprobante,fecha_emision,numero_serie,numero_correlativo,valor,isc,otros_cargos,tipo_moneda,numero_documento) VALUES(7,1,1,'01/03/2019','0003',9412,500,0,0,'PEN','20548030529');
 
-#GENERAR ASIENTOS DE DIARIO SEGÚN LIBRO CAJA Y BANCOS
+INSERT INTO _08 (entity_id, tipo_operacion, tipo_comprobante, fecha_emision, numero_serie,numero_correlativo, valor, icbp, isc, otros_cargos, tipo_moneda) VALUES (3,2,1,'2020-06-01','E001',3124,100,0,0,0,'PEN');
 
-#GENERAR ASIENTOS DE DIARIO SEGÚN REGISTRO DE COMPRAS
+#GENERAR ASIENTOS DE DIARIO CAJA Y BANCOS SEGUN CODIGO DE CUENTA INGRESADO
 
-#GENERAR ASIENTOS DE DIARIO SEGÚN REGISTRO DE VENTAS
+#GENERAR ASIENTOS DE DIARIO COMPRAS SEGUN TIPO DE COMPRA
+CREATE OR REPLACE FUNCTION purchase_entry() 
+RETURNS TRIGGER AS
+$$ 
+DECLARE      
+BEGIN
+IF NEW.cuo <> OLD.cuo THEN
+    INSERT INTO ;
+END IF;
+    return new;
+
+END;
+$$ LANGUAGE plpgsql;
+
+#GENERAR ASIENTOS DE DIARIO VENTAS SEGUN TIPO DE VENTA
+CREATE OR REPLACE FUNCTION sales_entry() 
+RETURNS TRIGGER AS
+$$ 
+DECLARE      
+BEGIN
+IF NEW.cuo <> OLD.cuo THEN
+    INSERT INTO ;
+END IF;
+    return new;
+
+END;
+$$ LANGUAGE plpgsql;
 
 #GENERAR DESTINOS EN LIBRO DIARIO SEGÚN ASIENTOS DE DIARIO
 
 
+#GENERAR ASIENTOS DE DIARIO DESTINO A CUENTA DE COSTO O GASTO SEGUN TIPO DE COMPRA
+
+#GENERAR ASIENTOS DE DIARIO DESTINO COSTO DE VENTAS SEGUN VENTAS
+
+#FILTRAR DECLARACION SIMPLIFICADA MENSUAL DE REGISTRO DE PAGOS
+CREATE OR REPLACE FUNCTION purchase_entry() 
+RETURNS TRIGGER AS
+$$ 
+DECLARE      
+BEGIN
+IF NEW.cuo <> OLD.cuo THEN
+    INSERT INTO ;
+END IF;
+    return new;
+
+END;
+
+
+$$ LANGUAGE plpgsql;
+
+#GENERAR PLE VENTAS
+CREATE OR REPLACE FUNCTION cash_payment() RETURNS TRIGGER AS $$
+DECLARE
+total_mn DEC(10,2);
+total DEC(10,2);
+ BEGIN
+	total = ROUND(1.18*NEW.valor_adquisicion,2) + NEW.isc + NEW.icbp + NEW.otros_cargos;
+	total_mn = (SELECT (CASE WHEN _08.tipo_moneda = 'USD' THEN ROUND(total*tc.usd_s,2) ELSE total END) AS "valor_mn" FROM _08 JOIN tc ON _08.fecha_emision = tc.fecha_sunat WHERE _08.id=NEW.id);
+
+IF total_mn<3000 AND NEW.medio_pago ISNULL THEN INSERT INTO _01(entity_id, tipo_movimiento,tipo_comprobante,numero_serie,numero_correlativo,fecha_operacion,importe, tipo_moneda) VALUES (NEW.entity_id, '2', NEW.tipo_comprobante, NEW.numero_serie, NEW.numero_correlativo, NEW.fecha_emision, total_mn, 'PEN'); 
+END IF;
+      RETURN NEW;
+   END;
+$$ LANGUAGE plpgsql;
+
+#GENERAR PLE COMPRAS 8.1
+CREATE OR REPLACE FUNCTION ple_81 RETURNS TRIGGER AS $$
+DECLARE
+bi_mn DEC(10,2);
+igv_mn DEC(10,2);
+isc_mn DEC(10,2);
+icbp_mn DEC(10,2);
+otros_cargos_mn DEC(10,2);
+total_mn DEC(10,2);
+BEGIN
+	bi_mn = (SELECT (CASE WHEN _08.tipo_moneda = 'USD' THEN ROUND(_08.valor_adquisicion*tc.usd_s,2) ELSE _08.valor_adquisicion END) AS "1_mn" FROM _08 JOIN tc ON _08.fecha_emision = tc.fecha_sunat WHERE _08.id=NEW.id);
+	igv_mm = (SELECT (CASE WHEN _08.tipo_moneda = 'USD' THEN ROUND(_08.valor_adquisicion*0.18*tc.usd_s,2) ELSE ROUND(_08.valor_adquisicion*0.18) END) AS "2_mn" FROM _08 JOIN tc ON _08.fecha_emision = tc.fecha_sunat WHERE _08.id=NEW.id);
+	isc_mn = (SELECT (CASE WHEN _08.tipo_moneda = 'USD' THEN ROUND(_08.isc*tc.usd_s,2) ELSE _08.isc END) AS "3_mn" FROM _08 JOIN tc ON _08.fecha_emision = tc.fecha_sunat WHERE _08.id=NEW.id);
+	icbp_mn = (SELECT (CASE WHEN _08.tipo_moneda = 'USD' THEN ROUND(_08.icbp*tc.usd_s,2) ELSE _08.icbp END) AS "4_mn" FROM _08 JOIN tc ON _08.fecha_emision = tc.fecha_sunat WHERE _08.id=NEW.id);
+	otro_cargos_mn = (SELECT (CASE WHEN _08.tipo_moneda = 'USD' THEN ROUND(_08.otros_cargos*tc.usd_s,2) ELSE _08.otros_cargos END) AS "5_mn" FROM _08 JOIN tc ON _08.fecha_emision = tc.fecha_sunat WHERE _08.id=NEW.id);
+	total_mn = bi_mn + igv_mn + isc_mn + icbp_mn + otros_cargos_mn;
+IF NEW.cuo ISNOTNULL THEN INSERT INTO acc.PLE81 (1,2,3,4,5,6,7,8,9,10,11,12,13,21,22,24,25,26,27,28,29,30,31,32,33,34,35,36) VALUES(
+
+
+#GENERAR PLE COMPRAS 8.2
+
+#RELLENAR TABLA RELATED 
+CREATE OR REPLACE FUNCTION fill_related() RETURNS TRIGGER AS
+$$
+BEGIN
+	IF NEW.numero_documento NOT IN (SELECT numero_documento FROM acc.related) THEN INSERT INTO related(numero_documento) VALUES(NEW.numero_documento);
+	END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 #RELLENAR TABLA CHANGESLOG
 CREATE OR REPLACE FUNCTION registerchanges() RETURNS TRIGGER AS $$
    BEGIN
-      INSERT INTO changeslog(usuario,subdiario,cuc,instante) VALUES (current_user, new.subdiario,new.cuc,now());
+      INSERT INTO changeslog(usuario,subdiario,id,instante) VALUES (current_user, new.subdiario,new.id,now());
       RETURN NEW;
    END;
 $$ LANGUAGE plpgsql;

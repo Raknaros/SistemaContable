@@ -1106,4 +1106,3 @@ INSERT INTO acc.ta10(codigo_tributo, descripcion) VALUES(8063, 'GASTOS ADMINISTR
 INSERT INTO acc.ta10(codigo_tributo, descripcion) VALUES(8081, 'FRACCIONAMIENTO PERT');
 INSERT INTO acc.ta10(codigo_tributo, descripcion) VALUES(8091, 'SALDO REMATE DE BIENES O VEHICULOS DECLARADOS EN ABANDONO');
 INSERT INTO acc.ta10(codigo_tributo, descripcion) VALUES(8111, 'FRACCIONAMIENTO PERTA – TESORO');
-INSERT INTO entities(entity_id, nombre_razon, numero_documento, telefono, email, usuario_sol, clave_sol) VALUES(1, 'INVERSIONES Y SERVICIOS RPM EIRL', 20548030529, 950125405, 'is.rpm@outlook.com', 'BATHROOR', 'Estudiomar1');
