@@ -100,9 +100,9 @@ $$ LANGUAGE 'plpgsql';
 --Trigger/Borrar pre registro de documentos de comercio exterior y prepagos de caja,detraccion cuando se emite nota de crédito por el importe total.
 
 -- Trigger de funcion fill_cui
-CREATE TRIGGER b_fill_cui5 BEFORE INSERT ON acc._5 FOR EACH ROW EXECUTE PROCEDURE fill_cui();
-CREATE TRIGGER b_fill_cui8 BEFORE INSERT ON acc._8 FOR EACH ROW EXECUTE PROCEDURE fill_cui();
-CREATE TRIGGER b_fill_cui8 BEFORE INSERT ON acc._2 FOR EACH ROW EXECUTE PROCEDURE fill_cui();
+CREATE TRIGGER b_fill_cui5 BEFORE INSERT OR UPDATE ON acc._5 FOR EACH ROW EXECUTE PROCEDURE fill_cui();
+CREATE TRIGGER b_fill_cui8 BEFORE INSERT OR UPDATE ON acc._8 FOR EACH ROW EXECUTE PROCEDURE fill_cui();
+CREATE TRIGGER b_fill_cui8 BEFORE INSERT OR UPDATE ON acc._2 FOR EACH ROW EXECUTE PROCEDURE fill_cui();
 --Trigger de funcion cash_payment
 CREATE TRIGGER pago_caja AFTER INSERT ON acc._8 FOR EACH ROW EXECUTE PROCEDURE cash_payment();
 CREATE TRIGGER cobro_caja AFTER INSERT ON acc._5 FOR EACH ROW EXECUTE PROCEDURE cash_payment();

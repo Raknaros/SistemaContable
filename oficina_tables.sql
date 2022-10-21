@@ -46,7 +46,7 @@ CREATE TABLE acc._1 (
 	tipo_moneda VARCHAR REFERENCES TS04(tipo_moneda) ON DELETE SET NULL,
 	descripcion VARCHAR,
 	glosa VARCHAR,
-	observaciones VARCHAR
+	observaciones VARCHAR,
 	cui_relacionado VARCHAR);
 CREATE TABLE acc._2 (
 	id BIGSERIAL PRIMARY KEY,
@@ -57,10 +57,6 @@ CREATE TABLE acc._2 (
 	entidad_financiera INTEGER REFERENCES TS03(entidad_financiera) ON DELETE SET NULL,
 	codigo_cuenta INTEGER,
 	numero_cuenta_relacionada BIGINT,
-	tipo_comprobante INTEGER REFERENCES TS10(tipo_comprobante) ON DELETE SET NULL,
-	numero_serie VARCHAR,
-	numero_correlativo VARCHAR,
-	numero_documento VARCHAR,
 	medio_pago INTEGER REFERENCES TS01(medio_pago) ON DELETE SET NULL,
 	fecha_operacion DATE,
 	numero_operacion BIGINT,
@@ -68,6 +64,7 @@ CREATE TABLE acc._2 (
 	tipo_moneda VARCHAR REFERENCES TS04(tipo_moneda) ON DELETE SET NULL,
 	descripcion VARCHAR,
 	cui VARCHAR,
+	cui_asociado VARCHAR,
 	observaciones VARCHAR);
 CREATE TABLE acc._3 (
 );
