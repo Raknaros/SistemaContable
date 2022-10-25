@@ -63,8 +63,9 @@ CREATE TABLE acc._2 (
 	importe DEC(10,2),
 	tipo_moneda VARCHAR REFERENCES TS04(tipo_moneda) ON DELETE SET NULL,
 	descripcion VARCHAR,
-	cui VARCHAR,
-	cui_asociado VARCHAR,
+	glosa VARCHAR,
+	cui VARCHAR UNIQUE,
+	cui_relacionado VARCHAR,
 	observaciones VARCHAR);
 CREATE TABLE acc._3 (
 );
